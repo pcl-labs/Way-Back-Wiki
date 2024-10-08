@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Way Back Wiki
+
+[Way Back Wiki](https://www.waybackwiki.org) is an open-source project that allows users to explore the history of Wikipedia articles. It provides a user-friendly interface to view article revisions, visualize changes over time, and compare different versions of articles.
+
+## Features
+
+- Search Wikipedia articles
+- View article revisions with a heatmap visualization
+- Compare different versions of articles with diff highlighting
+- Responsive design for both desktop and mobile use
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org/) (React framework)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [Shadcn UI](https://ui.shadcn.com/) for UI components
+- [React Calendar Heatmap](https://github.com/kevinsqi/react-calendar-heatmap) for revision visualization
 
 ## Getting Started
 
-First, run the development server:
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/way-back-wiki.git
+   cd way-back-wiki
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. Install dependencies:
+   ```
+   pnpm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. Run the development server:
+   ```
+   pnpm run dev
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contributing
 
-## Learn More
+We welcome contributions to Way Back Wiki! Here's how you can help:
 
-To learn more about Next.js, take a look at the following resources:
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes and commit them with a clear commit message
+4. Push your changes to your fork
+5. Submit a pull request to the main repository
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Please ensure your code adheres to the project's coding standards and includes appropriate tests.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Development Process
 
-## Deploy on Vercel
+1. Issues are tracked in the GitHub Issues tab
+2. Pull requests are reviewed by maintainers
+3. Continuous Integration checks are run on all pull requests
+4. Once approved and passing CI, pull requests are merged into the main branch
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Next Steps for Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Implement user authentication for saving favorite articles and revisions
+- Add more detailed statistics about article revisions
+- Improve performance for large articles with many revisions
+- Enhance mobile UI for better usability on smaller screens
+- Integrate with more Wikimedia projects beyond Wikipedia
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## Deployment
+
+Way Back Wiki is deployed on [Vercel](https://vercel.com) and can be accessed at [www.waybackwiki.org](https://www.waybackwiki.org).
+
+## Contact
+
+For any questions or concerns, please open an issue on this repository.
