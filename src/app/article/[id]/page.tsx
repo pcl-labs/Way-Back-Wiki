@@ -1,17 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
-import dynamic from 'next/dynamic';
+import React from 'react';
 import { Header } from '@/components/Header';
-import { Heatmap } from '@/components/Heatmap';
 import { RevisionList } from '@/components/RevisionList';
-import { Revision } from '@/types/revisions';
-import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
-
-const ClientSideArticle = dynamic(() => import('@/components/ClientSideArticle'), { 
-  ssr: false,
-  loading: () => <p>Loading article content...</p>
-});
+import { SnapshotLink } from '@/components/SnapshotLink';
+import { useRevisions } from '@/hooks/useWikipediaData';
 
 interface ArticlePageProps {
   params: { id: string };
@@ -19,16 +12,9 @@ interface ArticlePageProps {
 
 const ArticlePage: React.FC<ArticlePageProps> = ({ params }) => {
   const { id } = params;
-  const [selectedRevision, setSelectedRevision] = useState<string | null>(null);
-  const { revisions, isLoading: isRevisionsLoading } = useRevisions(id);
-  const { content, isLoading: isContentLoading } = useArticleContent(id);
+  const { revisions, isLoading } = useRevisions(id);
 
-  const handleRevisionSelect = (revision: Revision) => {
-    setSelectedRevision(revision.timestamp);
-    // Implement logic to fetch and display the selected revision
-  };
-
-  if (isRevisionsLoading || isContentLoading) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -36,26 +22,13 @@ const ArticlePage: React.FC<ArticlePageProps> = ({ params }) => {
     <>
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Article: {id}</h1>
-        <div className="mb-8">
-          <Heatmap 
+        <h1 className="text-3xl font-bold mb-6">Article Revisions: {id}</h1>
+        <SnapshotLink articleId={id} />
+        <div className="mt-8">
+          <RevisionList 
             revisions={revisions} 
-            onDayClick={(day) => {
-              console.log('Day clicked:', day);
-              // Add logic to handle day click, e.g., fetching revisions for that day
-            }} 
+            onRevisionSelect={(revision) => console.log('Selected revision:', revision)}
           />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
-            <ClientSideArticle content={content} selectedRevision={selectedRevision} />
-          </div>
-          <div>
-            <RevisionList 
-              revisions={revisions} 
-              onRevisionSelect={handleRevisionSelect}
-            />
-          </div>
         </div>
       </div>
     </>
