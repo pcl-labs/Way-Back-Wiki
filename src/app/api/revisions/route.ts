@@ -28,7 +28,16 @@ export async function GET(request: NextRequest) {
     const pageId = Object.keys(data.query.pages)[0];
     const revisions = data.query.pages[pageId].revisions || [];
 
-    const processedRevisions = revisions.map((rev: any, index: number) => ({
+    interface Revision {
+      revid: number;
+      parentid: number;
+      user: string;
+      timestamp: string;
+      comment: string;
+      '*': string;
+    }
+
+    const processedRevisions = revisions.map((rev: Revision, index: number) => ({
       id: rev.revid,
       parentId: rev.parentid,
       user: rev.user,
