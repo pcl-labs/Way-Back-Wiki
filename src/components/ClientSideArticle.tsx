@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from 'react';
+import React from 'react';
 import DOMPurify from 'dompurify';
 
 interface ClientSideArticleProps {
@@ -8,18 +8,13 @@ interface ClientSideArticleProps {
   selectedRevision: string | null;
 }
 
-const ClientSideArticle: FC<ClientSideArticleProps> = ({ content, selectedRevision }) => {
+const ClientSideArticle: React.FC<ClientSideArticleProps> = ({ content, selectedRevision }) => {
   const sanitizedContent = DOMPurify.sanitize(content);
 
   return (
     <div className="prose max-w-none">
+      {selectedRevision && <p>Selected revision: {selectedRevision}</p>}
       <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
-      {selectedRevision && (
-        <div className="mt-4 p-4 bg-yellow-100 rounded">
-          <p>Selected revision: {selectedRevision}</p>
-          {/* Implement diff view here when a revision is selected */}
-        </div>
-      )}
     </div>
   );
 };

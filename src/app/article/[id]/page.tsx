@@ -1,13 +1,12 @@
 "use client";
 
-import { FC, useState } from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
 import { RevisionList } from '@/components/RevisionList';
-import { useRevisions } from '@/hooks/useRevisions';
-import { useArticleContent } from '@/hooks/useArticleContent';
 import { Revision } from '@/types/revisions';
+import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
 
 const ClientSideArticle = dynamic(() => import('@/components/ClientSideArticle'), { 
   ssr: false,
@@ -15,19 +14,18 @@ const ClientSideArticle = dynamic(() => import('@/components/ClientSideArticle')
 });
 
 interface ArticlePageProps {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 }
 
-const ArticlePage: FC<ArticlePageProps> = ({ params }) => {
+const ArticlePage: React.FC<ArticlePageProps> = ({ params }) => {
   const { id } = params;
   const [selectedRevision, setSelectedRevision] = useState<string | null>(null);
   const { revisions, isLoading: isRevisionsLoading } = useRevisions(id);
   const { content, isLoading: isContentLoading } = useArticleContent(id);
 
-  const handleRevisionSelect = (revision: string) => {
-    setSelectedRevision(revision);
+  const handleRevisionSelect = (revision: Revision) => {
+    setSelectedRevision(revision.timestamp);
+    // Implement logic to fetch and display the selected revision
   };
 
   if (isRevisionsLoading || isContentLoading) {
@@ -35,9 +33,9 @@ const ArticlePage: FC<ArticlePageProps> = ({ params }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Article: {id}</h1>
         <div className="mb-8">
           <Heatmap 
@@ -55,12 +53,12 @@ const ArticlePage: FC<ArticlePageProps> = ({ params }) => {
           <div>
             <RevisionList 
               revisions={revisions} 
-              onRevisionSelect={(revision: Revision) => handleRevisionSelect(revision.id)}
+              onRevisionSelect={handleRevisionSelect}
             />
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 };
 
