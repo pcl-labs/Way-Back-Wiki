@@ -1,9 +1,10 @@
 export interface Revision {
+  id: number;
+  parentId: number;
   user: string;
   timestamp: string;
-  contentformat?: string;
-  contentmodel?: string;
   comment: string;
-  '*'?: string;  // This contains the actual content, now optional
-  anon?: string;  // Optional field for anonymous users
+  content: string;
+  '*': string;
+  // Add any other properties that your revision objects have
 }

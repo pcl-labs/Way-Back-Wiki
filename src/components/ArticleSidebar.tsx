@@ -1,31 +1,32 @@
 "use client";
 
-import { FC } from 'react';
+import React from 'react';
 import { Heatmap } from '@/components/Heatmap';
 import { RevisionList } from '@/components/RevisionList';
-import { useRevisions } from '@/hooks/useRevisions';
+import { Revision } from '@/types/revisions';
 
 interface ArticleSidebarProps {
-  articleId: string;
-  onRevisionSelect: (revision: string) => void;
+  revisions: Revision[];
+  onRevisionSelect: (revision: Revision) => void;
 }
 
-const ArticleSidebar: FC<ArticleSidebarProps> = ({ articleId, onRevisionSelect }) => {
-  const { revisions, isLoading } = useRevisions(articleId);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+export function ArticleSidebar({ revisions, onRevisionSelect }: ArticleSidebarProps) {
+  const handleDayClick = (day: Date) => {
+    // Handle day click logic here
+    console.log('Day clicked:', day);
+    // You can filter revisions for the selected day and update the state if needed
+  };
 
   return (
     <div className="hidden md:block">
-      <Heatmap revisions={revisions} onDayClick={(day) => {/* Handle day click */}} />
+      <Heatmap 
+        revisions={revisions} 
+        onDayClick={handleDayClick} 
+      />
       <RevisionList 
         revisions={revisions} 
         onRevisionSelect={onRevisionSelect} 
       />
     </div>
   );
-};
-
-export default ArticleSidebar;
+}
