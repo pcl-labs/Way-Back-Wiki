@@ -9,6 +9,7 @@ import {
   CommandList,
 } from "@/components/ui/command"
 
+
 interface SearchResult {
   pageid: number;
   title: string;
@@ -36,8 +37,8 @@ export default function SearchComponent() {
   }, [query, debouncedSearch]);
 
   return (
-    <Command className="rounded-lg border shadow-md">
-    <div className="flex items-center border=b px-3">
+    <Command className="rounded-lg border shadow-md w-full">
+    <div className="flex items-center border=b px-3 w-full">
       <CommandInput
         placeholder="Search Wikipedia..."
         value={query}
@@ -45,9 +46,10 @@ export default function SearchComponent() {
           setQuery(value)
           router.push(`/search?q=${encodeURIComponent(value)}`, { scroll: false })
         }}
+        className="flex-1 outline-none border-none focus:ring-0 focus:outline-none"
       />
       </div> 
-      <CommandList>
+      <CommandList className="max-h-[300px] overflow-y-auto">
           {results.map((result) => (
             <CommandItem
               key={result.pageid}
