@@ -2,8 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Command } from 'cmdk';
+import { Command, CommandItem} from 'cmdk';
 import { useDebounce } from '@/lib/hooks';
+import {
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandList,
+} from "@/components/ui/command"
+import { Search, Book, AlertCircle, Loader2 } from 'lucide-react';
 
 interface SearchResult {
   pageid: number;
@@ -32,25 +39,28 @@ export default function SearchComponent() {
   }, [query, debouncedSearch]);
 
   return (
-    <Command>
-      <Command.Input
+    <Command className="rounded-lg border shadow-md">
+    <div className="flex items-center border=b px-3">
+      <CommandInput
         placeholder="Search Wikipedia..."
         value={query}
         onValueChange={(value: string) => {
-          setQuery(value);
-          router.push(`/search?q=${encodeURIComponent(value)}`, { scroll: false });
+          setQuery(value)
+          router.push(`/search?q=${encodeURIComponent(value)}`, { scroll: false })
         }}
       />
-      <Command.List>
-        {results.map((result) => (
-          <Command.Item
-            key={result.pageid}
-            onSelect={() => router.push(`/article/${result.pageid}`)}
-          >
-            {result.title}
-          </Command.Item>
-        ))}
-      </Command.List>
+      </div> 
+      <CommandList>
+          {results.map((result) => (
+            <CommandItem
+              key={result.pageid}
+              onSelect={() => router.push(`/article/${result.pageid}`)}
+            className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
+            >
+              {result.title}
+            </CommandItem>
+          ))}
+      </CommandList>
     </Command>
-  );
+  )
 }
