@@ -5,12 +5,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Command, CommandItem} from 'cmdk';
 import { useDebounce } from '@/lib/hooks';
 import {
-  CommandEmpty,
-  CommandGroup,
   CommandInput,
   CommandList,
 } from "@/components/ui/command"
-import { Search, Book, AlertCircle, Loader2 } from 'lucide-react';
 
 interface SearchResult {
   pageid: number;
