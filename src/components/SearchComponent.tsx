@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Command, CommandItem} from 'cmdk';
+import { Command} from 'cmdk';
 import { useDebounce } from '@/lib/hooks';
 import {
+  CommandItem,
   CommandInput,
   CommandList,
 } from "@/components/ui/command"
@@ -56,6 +57,10 @@ export default function SearchComponent() {
               onSelect={() => router.push(`/article/${result.pageid}`)}
             className="px-2 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground"
             >
+              <span className="flex items-center">
+                  <span className="mr-2" aria-hidden="true">📚</span>
+                  {result.title}
+                </span>
               {result.title}
             </CommandItem>
           ))}
