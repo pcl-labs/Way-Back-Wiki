@@ -1,0 +1,215 @@
+.pageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+  max-width: 550px;
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  overflow: hidden;
+  padding: 20px;
+}
+  
+  .blurOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 5;
+  }
+  
+  .focused .blurOverlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .unfocused .blurOverlay {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+  }
+
+  .vercel {
+    width: 100%;
+    max-width: 550px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .vercel {
+    .cmdk-root {
+      max-width: 640px;
+      width: 100%;
+      padding: 10px;
+      background: #2a2a2a;
+      border-radius: 12px;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      border: 1px solid #3a3a3a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: transform 100ms ease;
+      outline: none;
+  
+      .dark & {
+        background: rgba(22, 22, 22, 0.7);
+      }
+    }
+  
+    .cmdk-input {
+      font-family: var(--font-sans);
+      border: none;
+      width: 100%;
+      font-size: 17px;
+      padding: 8px 8px 16px 8px;
+      outline: none;
+      background: #2a2a2a;
+      color: #ffffff;
+      border-bottom: 1px solid var(--gray6);
+      margin-bottom: 16px;
+      border-radius: 0;
+      box-sizing: border-box;
+      padding: 8px;
+  
+      &::placeholder {
+        color: #888888;
+      }
+    }
+  
+    .cmdk-vercel-badge {
+      height: 20px;
+      background: var(--grayA3);
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      font-size: 12px;
+      color: var(--grayA11);
+      border-radius: 4px;
+      margin: 4px 0 4px 4px;
+      user-select: none;
+      text-transform: capitalize;
+      font-weight: 500;
+    }
+  
+    .cmdk-item {
+      cursor: pointer;
+      height: 48px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      color: #e0e0e0;
+      user-select: none;
+      will-change: background, color;
+      transition: all 150ms ease;
+      transition-property: none;
+      padding: 10px 0;
+  
+      &[data-selected='true'] {
+        background: #3a3a3a;
+        color: #ffffff;
+      }
+  
+      &[data-disabled='true'] {
+        color: #666666;
+        cursor: not-allowed;
+      }
+  
+      &:active {
+        transition-property: background;
+        background: #444444;
+      }
+  
+      & + .cmdk-item {
+        margin-top: 4px;
+      }
+  
+      .cmdkItemIcon {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  
+    .cmdk-list {
+      height: min(330px, calc(var(--cmdk-list-height)));
+      max-height: 400px;
+      width: 100%;
+      overflow: auto;
+      overscroll-behavior: contain;
+      transition: 100ms ease;
+      transition-property: height;
+    }
+  
+    .cmdk-vercel-shortcuts {
+      display: flex;
+      margin-left: auto;
+      gap: 8px;
+  
+      .cmdkKbd {
+        font-family: var(--font-sans);
+        font-size: 12px;
+        min-width: 20px;
+        padding: 4px;
+        height: 20px;
+        border-radius: 4px;
+        color: var(--gray11);
+        background: var(--gray4);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+      }
+    }
+  
+    .cmdk-separator {
+      height: 1px;
+      width: 100%;
+      background: var(--gray5);
+      margin: 4px 0;
+    }
+  
+    *:not([hidden]) + .cmdk-group {
+      margin-top: 8px;
+    }
+  
+    .cmdk-group-heading {
+      user-select: none;
+      font-size: 12px;
+      color: var(--gray11);
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+  
+    .cmdk-empty {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      white-space: pre-wrap;
+      color: #888888;
+    }
+  }

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
 import { useDebounce } from '@/lib/hooks';
+import styles from './cmdksearch.module.css';
 
 interface SearchResult {
   pageid: number;
@@ -16,6 +17,7 @@ export default function SearchComponent() {
   const router = useRouter();
   const initialQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(initialQuery);
+  const [isFocused, setIsFocused] = useState(false);
 
   const debouncedSearch = useDebounce(async (value: string) => {
     if (value) {
@@ -32,25 +34,41 @@ export default function SearchComponent() {
   }, [query, debouncedSearch]);
 
   return (
-    <Command>
-      <Command.Input
-        placeholder="Search Wikipedia..."
-        value={query}
-        onValueChange={(value: string) => {
-          setQuery(value);
-          router.push(`/search?q=${encodeURIComponent(value)}`, { scroll: false });
-        }}
-      />
-      <Command.List>
-        {results.map((result) => (
-          <Command.Item
-            key={result.pageid}
-            onSelect={() => router.push(`/article/${result.pageid}`)}
-          >
-            {result.title}
-          </Command.Item>
-        ))}
-      </Command.List>
-    </Command>
-  );
+    <div className={styles.pageContainer}>
+      <div className={`${styles.searchContainer} ${isFocused ? styles.focused : ''}`}>
+        <div className={styles.blurOverlay} />
+        <div className={styles.vercel}>
+        <Command className={styles['cmdk-root']}>
+          <div>
+            <Command.Input
+              className={styles['cmdk-input']}
+              placeholder="Search Wikipedia..."
+              value={query}
+              onValueChange={(value: string) => {
+                setQuery(value)
+                router.push(`/search?q=${encodeURIComponent(value)}`, { scroll: false })
+              }}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}  
+            />
+          </div> 
+          <Command.List className={styles['cmdk-list']}>
+            {results.length === 0 && query !== '' && (
+              <Command.Empty className={styles['cmdk-empty']}>No results found.</Command.Empty>
+            )}
+            {results.map((result) => (
+              <Command.Item
+                key={result.pageid}
+                onSelect={() => router.push(`/article/${result.pageid}`)}
+                className={styles['cmdk-item']}
+              >
+                {result.title}
+              </Command.Item>
+            ))}
+          </Command.List>
+        </Command>
+      </div>
+    </div>
+  </div>
+  )
 }
