@@ -1,38 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Revision } from '@/types/revisions';
 
-export function useRevisions(identifier: string) {
+export function useRevisions(id: string) {
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchRevisions() {
       try {
-        // Determine if identifier is a page ID (numeric) or title
-        const isPageId = /^\d+$/.test(identifier);
-        const queryParam = isPageId ? `pageids=${identifier}` : `titles=${encodeURIComponent(identifier)}`;
-        
-        const res = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&prop=revisions&${queryParam}&rvprop=timestamp|user|comment|content&rvlimit=500&format=json&origin=*`
-        );
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=revisions&pageids=${id}&rvprop=timestamp|user|comment|content&rvlimit=500&format=json&origin=*`);
         const data = await res.json();
-        
-        // Handle both ID and title-based responses
-        const pages = data.query.pages;
-        const pageId = Object.keys(pages)[0];
-        const pageRevisions = pages[pageId]?.revisions || [];
-        
+        const pageRevisions = data.query.pages[id].revisions;
         setRevisions(pageRevisions);
       } catch (error) {
         console.error('Error fetching revisions:', error);
-        setRevisions([]);
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchRevisions();
-  }, [identifier]);
+  }, [id]);
 
   return { revisions, isLoading };
 }
