@@ -1,42 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Revision } from '@/types/revisions';
 
-export function useRevisions(id: string) {
-  const [revisions, setRevisions] = useState<Revision[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchRevisions() {
-      try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=revisions&pageids=${id}&rvprop=timestamp|user|comment|content&rvlimit=500&format=json&origin=*`);
-        const data = await res.json();
-        const pageRevisions = data.query.pages[id].revisions;
-        setRevisions(pageRevisions);
-      } catch (error) {
-        console.error('Error fetching revisions:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchRevisions();
-  }, [id]);
-
-  return { revisions, isLoading };
-}
-
-export function useArticleContent(id: string) {
+export function useArticleContentWithTitle(id: string) {
   const [content, setContent] = useState('');
+  const [title, setTitle] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchContent() {
       try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&pageid=${id}&format=json&origin=*`);
+        // First, fetch the article content and title.
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&pageids=${id}&format=json&origin=*`);
         const data = await res.json();
-        setContent(data.parse.text['*']);
+        const pageData = data.query.pages[id];
+
+        // Get the title of the article.
+        setTitle(pageData.title);
+
+        // If you need content, you can use another fetch here or you can extract it from revisions or other sources as needed.
+        const contentRes = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&pageid=${id}&format=json&origin=*`);
+        const contentData = await contentRes.json();
+        setContent(contentData.parse.text['*']);
+        
       } catch (error) {
-        console.error('Error fetching article content:', error);
+        console.error('Error fetching article content or title:', error);
       } finally {
         setIsLoading(false);
       }
@@ -45,5 +31,5 @@ export function useArticleContent(id: string) {
     fetchContent();
   }, [id]);
 
-  return { content, isLoading };
+  return { title, content, isLoading };
 }
