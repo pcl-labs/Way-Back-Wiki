@@ -9,6 +9,7 @@ import styles from './cmdksearch.module.css';
 interface SearchResult {
   pageid: number;
   title: string;
+  titleSlug?: string;
 }
 
 export default function SearchComponent() {
@@ -59,7 +60,7 @@ export default function SearchComponent() {
             {results.map((result) => (
               <Command.Item
                 key={result.pageid}
-                onSelect={() => router.push(`/article/${result.pageid}`)}
+                onSelect={() => router.push(`/article/${encodeURIComponent(result.title.replace(/ /g, '_'))}?id=${result.pageid}`)}
                 className={styles['cmdk-item']}
               >
                 {result.title}

@@ -4,7 +4,7 @@ const REVISIONS_PER_PAGE = 50;
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const id = searchParams.get('id') || '25955086';
+  const id = searchParams.get('id') || '';
   const page = parseInt(searchParams.get('page') || '1', 10);
   const rvcontinue = searchParams.get('rvcontinue') || '';
 
@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
 
     const pageId = Object.keys(data.query.pages)[0];
-    const revisions = data.query.pages[pageId].revisions || [];
+    const pageData = data.query.pages[pageId];
+    const revisions = pageData.revisions || [];
+    const pageTitle = pageData.title;
+    const titleSlug = pageTitle.replace(/ /g, '_');
 
     interface Revision {
       revid: number;
@@ -39,6 +42,8 @@ export async function GET(request: NextRequest) {
 
     const processedRevisions = revisions.map((rev: Revision, index: number) => ({
       id: rev.revid,
+      title: pageTitle,
+      titleSlug: titleSlug,
       parentId: rev.parentid,
       user: rev.user,
       timestamp: rev.timestamp,

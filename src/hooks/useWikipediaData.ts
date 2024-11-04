@@ -7,11 +7,20 @@ export function useRevisions(id: string) {
 
   useEffect(() => {
     async function fetchRevisions() {
+      if (!id) return;
+      
       try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&prop=revisions&pageids=${id}&rvprop=timestamp|user|comment|content&rvlimit=500&format=json&origin=*`);
+        const res = await fetch(`/api/revisions?id=${id}`);
         const data = await res.json();
-        const pageRevisions = data.query.pages[id].revisions;
-        setRevisions(pageRevisions);
+        
+        if (data.error) {
+          console.error('API Error:', data.error);
+          return;
+        }
+        
+        if (data.revisions) {
+          setRevisions(data.revisions);
+        }
       } catch (error) {
         console.error('Error fetching revisions:', error);
       } finally {
@@ -23,27 +32,4 @@ export function useRevisions(id: string) {
   }, [id]);
 
   return { revisions, isLoading };
-}
-
-export function useArticleContent(id: string) {
-  const [content, setContent] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchContent() {
-      try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&pageid=${id}&format=json&origin=*`);
-        const data = await res.json();
-        setContent(data.parse.text['*']);
-      } catch (error) {
-        console.error('Error fetching article content:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchContent();
-  }, [id]);
-
-  return { content, isLoading };
 }
