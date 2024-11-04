@@ -2,32 +2,52 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const revalidate = 3600; // Revalidate every hour
 
+interface WikiSearchResult {
+  pageid: number;
+  title: string;
+  snippet?: string;
+}
+
+interface WikiSearchResponse {
+  query?: {
+    search: WikiSearchResult[];
+  };
+  error?: {
+    code: string;
+    info: string;
+  };
+}
+
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get('q') || '';
+  const { searchParams } = new URL(request.url);
+  const query = searchParams.get('q');
+
+  if (!query) {
+    return NextResponse.json(
+      { error: 'Query parameter is required' },
+      { status: 400 }
+    );
+  }
 
   try {
-    const apiUrl = new URL('https://en.wikipedia.org/w/api.php');
-    apiUrl.searchParams.append('action', 'query');
-    apiUrl.searchParams.append('list', 'search');
-    apiUrl.searchParams.append('srsearch', query);
-    apiUrl.searchParams.append('format', 'json');
-    apiUrl.searchParams.append('origin', '*');
+    const response = await fetch(
+      `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(
+        query
+      )}&format=json&origin=*`
+    );
 
-    const response = await fetch(apiUrl.toString());
-    const data = await response.json();
-
-    // Process the results to include the URL-friendly title
-    if (data.query?.search) {
-      data.query.search = data.query.search.map((result: any) => ({
-        ...result,
-        titleSlug: result.title.replace(/ /g, '_')
-      }));
+    if (!response.ok) {
+      throw new Error(`Wikipedia API responded with status: ${response.status}`);
     }
 
+    const data: WikiSearchResponse = await response.json();
+
     return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error fetching search results:', error);
-    return NextResponse.json({ error: 'Failed to fetch search results' }, { status: 500 });
+  } catch (err) {
+    console.error('Search API error:', err);
+    return NextResponse.json(
+      { error: 'Failed to fetch search results' },
+      { status: 500 }
+    );
   }
 }

@@ -1,17 +1,17 @@
 'use client';
 
 import React from 'react';
+import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
 import { ClientSideArticle } from '@/components/ClientSideArticle';
 import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
 
-interface SnapshotPageProps {
-  params: { id: string };
-}
-
-const SnapshotPage: React.FC<SnapshotPageProps> = ({ params }) => {
-  const { id } = params;
+const SnapshotPage = () => {
+  // Use the useParams hook instead of receiving props
+  const params = useParams();
+  const id = params?.id as string;
+  
   const { revisions, isLoading: isRevisionsLoading } = useRevisions(id);
   const { content, isLoading: isContentLoading } = useArticleContent(id);
 
@@ -34,7 +34,7 @@ const SnapshotPage: React.FC<SnapshotPageProps> = ({ params }) => {
           />
         </div>
         <div className="mt-8">
-          <ClientSideArticle content={content} />
+          <ClientSideArticle content={content} title={id} />
         </div>
       </div>
     </>

@@ -4,7 +4,8 @@ const REVISIONS_PER_PAGE = 50;
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const id = searchParams.get('id') || '';
+  const id = searchParams.get('id');
+  const title = searchParams.get('title');
   const page = parseInt(searchParams.get('page') || '1', 10);
   const rvcontinue = searchParams.get('rvcontinue') || '';
 
@@ -12,11 +13,16 @@ export async function GET(request: NextRequest) {
     const apiUrl = new URL('https://en.wikipedia.org/w/api.php');
     apiUrl.searchParams.append('action', 'query');
     apiUrl.searchParams.append('prop', 'revisions');
-    apiUrl.searchParams.append('pageids', id);
     apiUrl.searchParams.append('rvprop', 'ids|timestamp|user|comment|content');
     apiUrl.searchParams.append('rvlimit', REVISIONS_PER_PAGE.toString());
     apiUrl.searchParams.append('format', 'json');
     apiUrl.searchParams.append('origin', '*');
+
+    if (id) {
+      apiUrl.searchParams.append('pageids', id);
+    } else if (title) {
+      apiUrl.searchParams.append('titles', title);
+    }
 
     if (rvcontinue) {
       apiUrl.searchParams.append('rvcontinue', rvcontinue);
