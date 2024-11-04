@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
 import { useDebounce } from '@/lib/hooks';
@@ -20,7 +20,7 @@ export default function SearchComponent() {
   const [query, setQuery] = useState(initialQuery);
   const [isFocused, setIsFocused] = useState(false);
 
-  const debouncedSearch = useDebounce(async (value: string) => {
+  const searchWikipedia = useCallback(async (value: string) => {
     if (value) {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(value)}`);
@@ -33,7 +33,9 @@ export default function SearchComponent() {
     } else {
       setResults([]);
     }
-  }, 300);
+  }, []);
+
+  const debouncedSearch = useDebounce(searchWikipedia, 300);
 
   useEffect(() => {
     debouncedSearch(query);
