@@ -23,7 +23,12 @@ const ArticlePage = () => {
       <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Article Revisions: {title}</h1>
-        {revisions.length > 0 && <SnapshotLink articleId={revisions[0].id.toString()} />}
+        {revisions.length > 0 && (
+          <SnapshotLink 
+            articleId={revisions[0].id.toString()} 
+            title={title}
+          />
+        )}
         <div className="mt-8">
           {isLoading ? (
             <div>Loading revisions...</div>

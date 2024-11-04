@@ -38,16 +38,20 @@ function useRevisions(idOrTitle: string) {
   return { revisions, isLoading };
 }
 
-function useArticleContent(revisionId: string) {
+function useArticleContent(titleOrId: string) {
   const [content, setContent] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchContent() {
-      if (!revisionId) return;
+      if (!titleOrId) return;
       
       try {
-        const res = await fetch(`/api/content?revisionId=${revisionId}`);
+        const queryParam = /^\d+$/.test(titleOrId) 
+          ? `articleId=${titleOrId}`
+          : `title=${encodeURIComponent(titleOrId)}`;
+        
+        const res = await fetch(`/api/article-content?${queryParam}`);
         const data = await res.json();
         
         if (data.error) {
@@ -66,7 +70,7 @@ function useArticleContent(revisionId: string) {
     }
 
     fetchContent();
-  }, [revisionId]);
+  }, [titleOrId]);
 
   return { content, isLoading };
 }
