@@ -17,7 +17,7 @@ interface HeatmapValue {
   count: number;
 }
 
-export function Heatmap({ revisions, onDayClick }: HeatmapProps) {
+export function Heatmap({revisions}: HeatmapProps) {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [currentTileString, setCurrentTileString] = useState<string>();
