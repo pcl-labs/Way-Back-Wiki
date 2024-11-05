@@ -32,11 +32,23 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
 }
 
 export function RevisionList({ revisions, onRevisionSelect }: RevisionListProps) {
-  const [expandedRevision, setExpandedRevision] = useState<string | null>(null);
+  const [expandedRevisions, setExpandedRevisions] = useState<Set<string>>(new Set());
 
   if (!revisions || revisions.length === 0) {
     return <div>No revisions available.</div>;
   }
+
+  const toggleRevision = (timestamp: string) => {
+    setExpandedRevisions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(timestamp)) {
+        newSet.delete(timestamp);
+      } else {
+        newSet.add(timestamp);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <div className="space-y-4">
@@ -53,9 +65,13 @@ export function RevisionList({ revisions, onRevisionSelect }: RevisionListProps)
               </span>
               <button 
                 className="p-1 hover:bg-gray-200 rounded"
-                onClick={() => setExpandedRevision(expandedRevision === revision.timestamp ? null : revision.timestamp)}
+                onClick={() => toggleRevision(revision.timestamp)}
+                aria-expanded={expandedRevisions.has(revision.timestamp)}
               >
-                {expandedRevision === revision.timestamp ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {expandedRevisions.has(revision.timestamp) ? 
+                  <ChevronUp size={16} /> : 
+                  <ChevronDown size={16} />
+                }
               </button>
             </div>
             <div className="text-sm text-gray-600">
@@ -63,11 +79,13 @@ export function RevisionList({ revisions, onRevisionSelect }: RevisionListProps)
               <br />
               <span>Comment: {revision.comment || 'No comment'}</span>
             </div>
-            {expandedRevision === revision.timestamp && index < revisions.length - 1 && (
-              <DiffView 
-                oldContent={revisions[index + 1]['*'] || ''} 
-                newContent={revision['*'] || ''} 
-              />
+            {expandedRevisions.has(revision.timestamp) && index < revisions.length - 1 && (
+              <div className="mt-2 border-t pt-2">
+                <DiffView 
+                  oldContent={revisions[index + 1].content || ''} 
+                  newContent={revision.content || ''} 
+                />
+              </div>
             )}
           </li>
         ))}

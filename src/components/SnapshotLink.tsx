@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation';
 
 interface SnapshotLinkProps {
   articleId: string;
+  title: string;
 }
 
-export function SnapshotLink({ articleId }: SnapshotLinkProps) {
+export function SnapshotLink({ articleId, title }: SnapshotLinkProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/snapshot/${articleId}`);
+    router.push(`/snapshot/${articleId}?title=${encodeURIComponent(title)}`);
   };
 
   return (
