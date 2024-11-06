@@ -10,9 +10,10 @@ interface SnapshotLinkProps {
 
 export function SnapshotLink({ articleId, title }: SnapshotLinkProps) {
   const router = useRouter();
+  const slug = title.replace(/ /g, '_');
 
   const handleClick = () => {
-    router.push(`/snapshot/${articleId}?title=${encodeURIComponent(title)}`);
+    router.push(`/article/${slug}/snapshots/${articleId}`);
   };
 
   return (

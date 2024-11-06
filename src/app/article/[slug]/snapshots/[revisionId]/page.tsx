@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
 import { ArticleContent } from '@/components/ArticleContent';
@@ -9,13 +9,12 @@ import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
 
 const SnapshotPage = () => {
   const params = useParams();
-  const searchParams = useSearchParams();
-  const id = params?.id as string;
-  const encodedTitle = searchParams.get('title') || '';
-  const title = decodeURIComponent(encodedTitle.replace(/_/g, ' '));
+  const slug = params?.slug as string;
+  const revisionId = params?.revisionId as string;
+  const title = decodeURIComponent(slug.replace(/_/g, ' '));
   
   const { revisions, isLoading: isRevisionsLoading } = useRevisions(title);
-  const { content, isLoading: isContentLoading } = useArticleContent(id, title);
+  const { content, isLoading: isContentLoading } = useArticleContent(revisionId, title);
 
   if (isRevisionsLoading || isContentLoading) {
     return <div>Loading...</div>;
@@ -44,4 +43,4 @@ const SnapshotPage = () => {
   );
 };
 
-export default SnapshotPage;
+export default SnapshotPage; 
