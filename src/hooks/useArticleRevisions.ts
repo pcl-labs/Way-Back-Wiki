@@ -27,8 +27,8 @@ export function useArticleRevisions(title: string) {
       const data = await response.json();
       
       setRevisions(prev => {
-        const existingIds = new Set(prev.map(r => r.id));
-        const newRevisions = data.revisions.filter(r => !existingIds.has(r.id));
+        const existingIds = new Set(prev.map((r: ArticleRevision) => r.id));
+        const newRevisions = data.revisions.filter((r: ArticleRevision) => !existingIds.has(r.id));
         return [...prev, ...newRevisions];
       });
       

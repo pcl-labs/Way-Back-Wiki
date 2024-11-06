@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const REVISIONS_PER_PAGE = 100;
-
 interface WikiRevision {
   revid: number;
   parentid?: number;
