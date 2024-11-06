@@ -15,7 +15,10 @@ interface HeatmapProps {
 interface HeatmapValue {
   date: string;
   count: number;
-  revisions: Array<{ timestamp: string }>;
+  revisions: Array<{ 
+    id: string;
+    timestamp: string;
+  }>;
 }
 
 export function Heatmap({ data, maxCount, onDayClick }: HeatmapProps) {
@@ -43,8 +46,11 @@ export function Heatmap({ data, maxCount, onDayClick }: HeatmapProps) {
           {value.count} revision{value.count !== 1 ? 's' : ''}
         </div>
         <ul className="mt-1 space-y-1">
-          {value.revisions.map((revision, index) => (
-            <li key={index} className="text-xs text-muted-foreground">
+          {value.revisions.map((revision) => (
+            <li 
+              key={revision.id}
+              className="text-xs text-muted-foreground"
+            >
               {format(new Date(revision.timestamp), 'h:mm a')}
             </li>
           ))}
@@ -62,24 +68,28 @@ export function Heatmap({ data, maxCount, onDayClick }: HeatmapProps) {
           values={values}
           classForValue={(value) => getColorClass(value ? value.count : 0)}
           onClick={(value) => value && onDayClick && onDayClick(new Date(value.date))}
-          transformDayElement={(element, value, index) => (
-            <Tooltip.Root key={index}>
-              <Tooltip.Trigger asChild>
-                {React.cloneElement(element as React.ReactElement)}
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content 
-                  side="top" 
-                  align="center"
-                  sideOffset={5}
-                  className="z-50 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
-                >
-                  {value && renderTooltipContent(value as HeatmapValue)}
-                  <Tooltip.Arrow className="fill-popover" />
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          )}
+          titleForValue={(value) => value ? format(new Date(value.date), 'MMM d, yyyy') : ''}
+          transformDayElement={(element, value, index) => {
+            const key = value ? `day-${value.date}-${index}` : `empty-${index}`;
+            return (
+              <Tooltip.Root key={key}>
+                <Tooltip.Trigger asChild>
+                  {React.cloneElement(element as React.ReactElement, { key })}
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content 
+                    side="top" 
+                    align="center"
+                    sideOffset={5}
+                    className="z-50 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+                  >
+                    {value && renderTooltipContent(value as HeatmapValue)}
+                    <Tooltip.Arrow className="fill-popover" />
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            );
+          }}
         />
         <style jsx global>{`
           .react-calendar-heatmap {

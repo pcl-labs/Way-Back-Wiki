@@ -2,12 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-interface ArticleContentResponse {
-  content: string;
-  title: string;
-}
-
-export const useArticleContent = (articleId?: string, title?: string) => {
+export function useArticleSnapshots(revisionId?: string, title?: string) {
   const [content, setContent] = useState('');
   const [pageTitle, setPageTitle] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -15,21 +10,19 @@ export const useArticleContent = (articleId?: string, title?: string) => {
 
   useEffect(() => {
     const fetchContent = async () => {
+      if (!revisionId || !title) return;
+      
       setIsLoading(true);
       setError(null);
       
       try {
-        const queryParam = articleId 
-          ? `articleId=${articleId}`
-          : `title=${encodeURIComponent(title || '')}`;
-        
-        const response = await fetch(`/api/article-content?${queryParam}`);
+        const response = await fetch(`/api/articles/${encodeURIComponent(title)}/snapshots/${revisionId}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch article content');
         }
         
-        const data: ArticleContentResponse = await response.json();
+        const data = await response.json();
         setContent(data.content);
         setPageTitle(data.title);
       } catch (error) {
@@ -40,10 +33,8 @@ export const useArticleContent = (articleId?: string, title?: string) => {
       }
     };
 
-    if (articleId || title) {
-      fetchContent();
-    }
-  }, [articleId, title]);
+    fetchContent();
+  }, [revisionId, title]);
 
   return { content, pageTitle, isLoading, error };
-};
+}

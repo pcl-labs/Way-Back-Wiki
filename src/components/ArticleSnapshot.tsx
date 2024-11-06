@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import DOMPurify from 'isomorphic-dompurify';
 import '@/styles/wikipedia-styles.css';
 
-interface ArticleContentProps {
+interface ArticleSnapshotProps {
   html: string;
   className?: string;
 }
 
-export function ArticleContent({ html, className = '' }: ArticleContentProps) {
+export function ArticleSnapshot({ html, className = '' }: ArticleSnapshotProps) {
   const [sanitizedHTML, setSanitizedHTML] = useState('');
 
   useEffect(() => {

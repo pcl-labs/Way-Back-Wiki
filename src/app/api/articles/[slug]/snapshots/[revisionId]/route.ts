@@ -1,12 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+export async function GET(request: Request) {
+  const { pathname } = new URL(request.url);
+  const revisionId = pathname.split('/').pop();
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const articleId = searchParams.get('articleId');
-  const title = searchParams.get('title');
-
-  if (!articleId && !title) {
-    return NextResponse.json({ error: 'Article ID or title is required' }, { status: 400 });
+  if (!revisionId) {
+    return Response.json({ error: 'Revision ID is required' }, { status: 400 });
   }
 
   try {
@@ -15,12 +12,7 @@ export async function GET(request: NextRequest) {
     apiUrl.searchParams.append('format', 'json');
     apiUrl.searchParams.append('origin', '*');
     apiUrl.searchParams.append('prop', 'text|displaytitle');
-
-    if (articleId) {
-      apiUrl.searchParams.append('oldid', articleId);
-    } else if (title) {
-      apiUrl.searchParams.append('page', decodeURIComponent(title));
-    }
+    apiUrl.searchParams.append('oldid', revisionId);
 
     const response = await fetch(apiUrl.toString());
 
@@ -37,9 +29,9 @@ export async function GET(request: NextRequest) {
     const content = data.parse.text['*'];
     const displayTitle = data.parse.displaytitle;
 
-    return NextResponse.json({ content, title: displayTitle });
+    return Response.json({ content, title: displayTitle });
   } catch (error) {
     console.error('Error fetching article content:', error);
-    return NextResponse.json({ error: 'Failed to fetch article content' }, { status: 500 });
+    return Response.json({ error: 'Failed to fetch article content' }, { status: 500 });
   }
 }
