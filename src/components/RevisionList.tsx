@@ -3,29 +3,26 @@
 import React, { useState } from 'react';
 import { Revision } from '@/types/revisions';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { diffLines, Change } from 'diff';
 
 interface RevisionListProps {
   revisions: Revision[];
   onRevisionSelect: (revision: Revision) => void;
 }
 
-function DiffView({ oldContent, newContent }: { oldContent: string; newContent: string }) {
-  const diff = diffLines(oldContent, newContent);
-
+function DiffView({ diff }: { diff: string }) {
   return (
-    <pre className="text-sm overflow-x-auto">
-      {diff.map((part: Change, index: number) => (
-        <span
+    <pre className="text-sm overflow-x-auto p-2 border rounded">
+      {diff.split('\n').map((line, index) => (
+        <div
           key={index}
           className={
-            part.added ? 'bg-green-200' :
-            part.removed ? 'bg-red-200' :
-            ''
+            line.startsWith('+') ? 'bg-green-100 text-green-800 pl-2' :
+            line.startsWith('-') ? 'bg-red-100 text-red-800 pl-2' :
+            'pl-2'
           }
         >
-          {part.value}
-        </span>
+          <code>{line}</code>
+        </div>
       ))}
     </pre>
   );
@@ -54,7 +51,7 @@ export function RevisionList({ revisions, onRevisionSelect }: RevisionListProps)
     <div className="space-y-4">
       <h2 className="text-2xl font-semibold">Revisions</h2>
       <ul className="space-y-2">
-        {revisions.map((revision, index) => (
+        {revisions.map((revision) => (
           <li key={revision.timestamp} className="border p-2 rounded hover:bg-gray-100">
             <div className="flex justify-between items-center cursor-pointer">
               <span 
@@ -79,12 +76,9 @@ export function RevisionList({ revisions, onRevisionSelect }: RevisionListProps)
               <br />
               <span>Comment: {revision.comment || 'No comment'}</span>
             </div>
-            {expandedRevisions.has(revision.timestamp) && index < revisions.length - 1 && (
+            {expandedRevisions.has(revision.timestamp) && revision.diff && (
               <div className="mt-2 border-t pt-2">
-                <DiffView 
-                  oldContent={revisions[index + 1].content || ''} 
-                  newContent={revision.content || ''} 
-                />
+                <DiffView diff={revision.diff.diff || ''} />
               </div>
             )}
           </li>

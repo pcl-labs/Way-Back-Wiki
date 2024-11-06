@@ -2,6 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const REVISIONS_PER_PAGE = 50;
 
+interface WikiRevision {
+  revid: number;
+  parentid?: number;
+  user: string;
+  timestamp: string;
+  comment: string;
+}
+
+interface WikiDiff {
+  fromRevId: number;
+  toRevId: number;
+  diff: string;
+}
+
+interface ProcessedRevision {
+  id: number;
+  title: string;
+  titleSlug: string;
+  parentId?: number;
+  user: string;
+  timestamp: string;
+  comment: string;
+  diff: WikiDiff | null;
+}
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const id = searchParams.get('id');
@@ -17,7 +42,7 @@ export async function GET(request: NextRequest) {
     const apiUrl = new URL('https://en.wikipedia.org/w/api.php');
     apiUrl.searchParams.append('action', 'query');
     apiUrl.searchParams.append('prop', 'revisions');
-    apiUrl.searchParams.append('rvprop', 'ids|timestamp|user|comment|content');
+    apiUrl.searchParams.append('rvprop', 'ids|timestamp|user|comment'); // Only fetch metadata, not content
     apiUrl.searchParams.append('rvlimit', REVISIONS_PER_PAGE.toString());
     apiUrl.searchParams.append('format', 'json');
     apiUrl.searchParams.append('origin', '*');
@@ -60,20 +85,43 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Page not found' }, { status: 404 });
     }
 
-    const revisions = pageData.revisions || [];
+    const revisions = pageData.revisions || [] as WikiRevision[];
     const pageTitle = pageData.title;
     const titleSlug = pageTitle.replace(/ /g, '_');
 
-    interface Revision {
-      revid: number;
-      parentid: number;
-      user: string;
-      timestamp: string;
-      comment: string;
-      '*': string;
-    }
+    const diffs = await Promise.all(revisions.map(async (rev: WikiRevision, index: number) => {
+      if (index === revisions.length - 1) return null;
 
-    const processedRevisions = revisions.map((rev: Revision, index: number) => ({
+      const nextRevId = revisions[index + 1].revid;
+      const diffUrl = new URL('https://en.wikipedia.org/w/api.php');
+      diffUrl.searchParams.append('action', 'query');
+      diffUrl.searchParams.append('prop', 'revisions');
+      diffUrl.searchParams.append('revids', rev.revid.toString());
+      diffUrl.searchParams.append('rvdiffto', nextRevId.toString());
+      diffUrl.searchParams.append('format', 'json');
+      diffUrl.searchParams.append('origin', '*');
+
+      const diffResponse = await fetch(diffUrl.toString());
+      if (!diffResponse.ok) {
+        console.error(`Failed to fetch diff for revision ${rev.revid}`);
+        return null;
+      }
+
+      const diffData = await diffResponse.json();
+      if (diffData?.query?.pages) {
+        const diffPage = diffData.query.pages[Object.keys(diffData.query.pages)[0]];
+        if (diffPage?.revisions && diffPage.revisions[0]?.diff) {
+          return {
+            fromRevId: nextRevId,
+            toRevId: rev.revid,
+            diff: diffPage.revisions[0].diff['*']
+          };
+        }
+      }
+      return null;
+    }));
+
+    const processedRevisions: ProcessedRevision[] = revisions.map((rev: WikiRevision, index: number) => ({
       id: rev.revid,
       title: pageTitle,
       titleSlug: titleSlug,
@@ -81,11 +129,7 @@ export async function GET(request: NextRequest) {
       user: rev.user,
       timestamp: rev.timestamp,
       comment: rev.comment,
-      content: rev['*'],
-      diff: index < revisions.length - 1 ? {
-        from: revisions[index + 1]['*'],
-        to: rev['*']
-      } : null
+      diff: diffs[index] || null
     }));
 
     const nextRvContinue = data.continue?.rvcontinue || null;

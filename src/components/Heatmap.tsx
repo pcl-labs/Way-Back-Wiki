@@ -3,46 +3,27 @@
 import React, { useMemo } from 'react';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
-import { Revision } from '@/types/revisions';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { format } from 'date-fns';
 
 interface HeatmapProps {
-  revisions: Revision[];
-  onDayClick: (day: Date) => void;
+  data: HeatmapValue[];
+  maxCount: number;
+  onDayClick?: (day: Date) => void;
 }
 
 interface HeatmapValue {
   date: string;
   count: number;
-  revisions: Revision[];
+  revisions: Array<{ timestamp: string }>;
 }
 
-export function Heatmap({ revisions, onDayClick }: HeatmapProps) {
+export function Heatmap({ data, maxCount, onDayClick }: HeatmapProps) {
   const startDate = new Date();
   startDate.setFullYear(startDate.getFullYear() - 1);
   const endDate = new Date();
 
-  const values = useMemo(() => {
-    const countMap: { [key: string]: { count: number; revisions: Revision[] } } = {};
-    
-    revisions.forEach(revision => {
-      const date = new Date(revision.timestamp).toISOString().split('T')[0];
-      if (!countMap[date]) {
-        countMap[date] = { count: 0, revisions: [] };
-      }
-      countMap[date].count += 1;
-      countMap[date].revisions.push(revision);
-    });
-
-    return Object.entries(countMap).map(([date, data]): HeatmapValue => ({
-      date,
-      count: data.count,
-      revisions: data.revisions,
-    }));
-  }, [revisions]);
-
-  const maxCount = useMemo(() => Math.max(...values.map(v => v.count)), [values]);
+  const values = useMemo(() => data, [data]);
 
   const getColorClass = (count: number): string => {
     if (!count) return 'color-empty';
@@ -80,21 +61,20 @@ export function Heatmap({ revisions, onDayClick }: HeatmapProps) {
           endDate={endDate}
           values={values}
           classForValue={(value) => getColorClass(value ? value.count : 0)}
-          onClick={(value) => value && onDayClick(new Date(value.date))}
-          titleForValue={(value) => ''} // Empty string as we're using custom tooltip
-          transformDayElement={(element, value) => (
-            <Tooltip.Root key={element.key}>
+          onClick={(value) => value && onDayClick && onDayClick(new Date(value.date))}
+          transformDayElement={(element, value, index) => (
+            <Tooltip.Root key={index}>
               <Tooltip.Trigger asChild>
-                {element}
+                {React.cloneElement(element as React.ReactElement)}
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content 
                   side="top" 
                   align="center"
                   sideOffset={5}
-                  className="z-50 animate-in fade-in-0 zoom-in-95"
+                  className="z-50 animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
                 >
-                  {renderTooltipContent(value)}
+                  {value && renderTooltipContent(value as HeatmapValue)}
                   <Tooltip.Arrow className="fill-popover" />
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -102,6 +82,15 @@ export function Heatmap({ revisions, onDayClick }: HeatmapProps) {
           )}
         />
         <style jsx global>{`
+          .react-calendar-heatmap {
+            width: 100%;
+          }
+          .react-calendar-heatmap rect {
+            rx: 2;
+          }
+          .react-calendar-heatmap .color-empty {
+            fill: #ebedf0;
+          }
           .react-calendar-heatmap .color-github-1 { fill: #9be9a8; }
           .react-calendar-heatmap .color-github-2 { fill: #40c463; }
           .react-calendar-heatmap .color-github-3 { fill: #30a14e; }

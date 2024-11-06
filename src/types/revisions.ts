@@ -6,5 +6,8 @@ export interface Revision {
   comment: string;
   content: string;
   '*': string;
-  // Add any other properties that your revision objects have
+  diff?: {
+    diff: string;
+    toRevId: number;
+  };
 }
