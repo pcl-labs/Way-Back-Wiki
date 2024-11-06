@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
@@ -13,12 +13,20 @@ const SnapshotPage = () => {
   const revisionId = params?.revisionId as string;
   const title = decodeURIComponent(slug.replace(/_/g, ' '));
   
-  const { revisions, isLoading: isRevisionsLoading } = useRevisions(title);
+  const { revisions, isLoading: isRevisionsLoading, hasMore, loadMore } = useRevisions(title);
   const { content, isLoading: isContentLoading } = useArticleContent(revisionId, title);
 
-  // First, transform your revisions data into the format Heatmap expects
+  // Transform revisions data into heatmap format with unique keys
   const heatmapData = useMemo(() => {
-    const countMap: { [key: string]: { count: number; revisions: Array<{ timestamp: string }> } } = {};
+    const countMap: { 
+      [key: string]: { 
+        count: number; 
+        revisions: Array<{ 
+          id: string;
+          timestamp: string 
+        }> 
+      } 
+    } = {};
     
     revisions.forEach(revision => {
       const date = new Date(revision.timestamp).toISOString().split('T')[0];
@@ -26,7 +34,10 @@ const SnapshotPage = () => {
         countMap[date] = { count: 0, revisions: [] };
       }
       countMap[date].count += 1;
-      countMap[date].revisions.push({ timestamp: revision.timestamp });
+      countMap[date].revisions.push({ 
+        id: revision.id.toString(),
+        timestamp: revision.timestamp 
+      });
     });
 
     return Object.entries(countMap).map(([date, data]) => ({
@@ -38,11 +49,35 @@ const SnapshotPage = () => {
 
   // Calculate the maximum count
   const maxCount = useMemo(() => {
-    return Math.max(...heatmapData.map(d => d.count));
+    return Math.max(...heatmapData.map(d => d.count), 1); // Add 1 as fallback for empty data
   }, [heatmapData]);
 
-  if (isRevisionsLoading || isContentLoading) {
-    return <div>Loading...</div>;
+  // Add intersection observer for infinite scrolling
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isRevisionsLoading) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.disconnect();
+      }
+    };
+  }, [hasMore, isRevisionsLoading, loadMore]);
+
+  if (isContentLoading) {
+    return <div>Loading article content...</div>;
   }
 
   return (
@@ -64,6 +99,12 @@ const SnapshotPage = () => {
           <h2 className="text-2xl font-bold mb-4">{title}</h2>
           <ArticleContent html={content} className="prose max-w-none" />
         </div>
+      </div>
+      <div 
+        ref={observerTarget} 
+        className="h-10 flex items-center justify-center"
+      >
+        {isRevisionsLoading && <div>Loading more revisions...</div>}
       </div>
     </>
   );
