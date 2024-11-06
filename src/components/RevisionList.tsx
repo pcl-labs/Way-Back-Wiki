@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Revision } from '@/types/revisions';
+import { ArticleRevision } from '@/types/articleRevisions';
 
 interface RevisionListProps {
-  revisions: Revision[];
-  onRevisionSelect?: (revision: Revision) => void;
+  revisions: ArticleRevision[];
+  onRevisionSelect?: (revision: ArticleRevision) => void;
 }
 
 export const RevisionList: React.FC<RevisionListProps> = ({ revisions, onRevisionSelect }) => {

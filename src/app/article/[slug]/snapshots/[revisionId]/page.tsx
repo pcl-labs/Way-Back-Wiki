@@ -4,7 +4,7 @@ import React, { useMemo, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
-import { ArticleContent } from '@/components/ArticleContent';
+import { ArticleSnapshot } from '@/components/ArticleSnapshot';
 import { useArticleRevisions } from '@/hooks/useArticleRevisions';
 import { useArticleSnapshots } from '@/hooks/useArticleSnapshots';
 
@@ -98,7 +98,7 @@ const SnapshotPage = () => {
         </div>
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">{title}</h2>
-          <ArticleContent html={content} className="prose max-w-none" />
+          <ArticleSnapshot html={content} className="prose max-w-none" />
         </div>
       </div>
       <div 

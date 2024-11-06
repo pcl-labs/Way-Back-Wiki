@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
-import { Revision } from '@/types/revisions';
+import { ArticleRevision } from '@/types/articleRevisions';
 
 export function useArticleRevisions(title: string) {
-  const [revisions, setRevisions] = useState<Revision[]>([]);
+  const [revisions, setRevisions] = useState<ArticleRevision[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
