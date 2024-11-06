@@ -5,14 +5,14 @@ import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { RevisionList } from '@/components/RevisionList';
 import { SnapshotLink } from '@/components/SnapshotLink';
-import { useRevisions } from '@/hooks/useWikipediaData';
+import { useArticleRevisions } from '@/hooks/useArticleRevisions';
 import { Revision } from '@/types/revisions';
 
 const ArticlePage = () => {
   const params = useParams();
   const slug = params?.slug as string;
   const title = decodeURIComponent(slug.replace(/_/g, ' '));
-  const { revisions, isLoading } = useRevisions(title);
+  const { revisions, isLoading } = useArticleRevisions(title);
 
   const handleRevisionSelect = (revision: Revision) => {
     console.log('Selected revision:', revision);

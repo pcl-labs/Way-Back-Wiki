@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const articleId = searchParams.get('articleId');
-  const title = searchParams.get('title');
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { slug: string; revisionId: string } }
+) {
+  const title = decodeURIComponent(params.slug.replace(/_/g, ' '));
+  const revisionId = params.revisionId;
 
-  if (!articleId && !title) {
-    return NextResponse.json({ error: 'Article ID or title is required' }, { status: 400 });
+  if (!revisionId) {
+    return NextResponse.json({ error: 'Revision ID is required' }, { status: 400 });
   }
 
   try {
@@ -15,12 +17,7 @@ export async function GET(request: NextRequest) {
     apiUrl.searchParams.append('format', 'json');
     apiUrl.searchParams.append('origin', '*');
     apiUrl.searchParams.append('prop', 'text|displaytitle');
-
-    if (articleId) {
-      apiUrl.searchParams.append('oldid', articleId);
-    } else if (title) {
-      apiUrl.searchParams.append('page', decodeURIComponent(title));
-    }
+    apiUrl.searchParams.append('oldid', revisionId);
 
     const response = await fetch(apiUrl.toString());
 

@@ -1,8 +1,9 @@
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { Revision } from '@/types/revisions';
-import { useArticleContent } from './useArticleContent';
 
-function useRevisions(title: string) {
+export function useArticleRevisions(title: string) {
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,20 +20,18 @@ function useRevisions(title: string) {
         params.append('rvcontinue', continueFrom);
       }
 
-      const response = await fetch(`/api/revisions?${params}`);
+      const response = await fetch(`/api/articles/${encodeURIComponent(title)}/revisions?${params}`);
       if (!response.ok) {
         throw new Error('Failed to fetch revisions');
       }
       const data = await response.json();
       
-      // Append new revisions, ensuring no duplicates
       setRevisions(prev => {
         const existingIds = new Set(prev.map(r => r.id));
         const newRevisions = data.revisions.filter(r => !existingIds.has(r.id));
         return [...prev, ...newRevisions];
       });
       
-      // Update continue token and hasMore status
       setContinueToken(data.continue);
       setHasMore(!!data.continue);
     } catch (error) {
@@ -43,9 +42,8 @@ function useRevisions(title: string) {
     }
   }, [title]);
 
-  // Initial load
   useEffect(() => {
-    setRevisions([]); // Reset revisions when title changes
+    setRevisions([]);
     setContinueToken(null);
     setHasMore(true);
     fetchRevisions();
@@ -59,5 +57,3 @@ function useRevisions(title: string) {
 
   return { revisions, isLoading, error, hasMore, loadMore };
 }
-
-export { useRevisions, useArticleContent };

@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
 import { ArticleContent } from '@/components/ArticleContent';
-import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
+import { useArticleRevisions } from '@/hooks/useArticleRevisions';
+import { useArticleSnapshots } from '@/hooks/useArticleSnapshots';
 
 const SnapshotPage = () => {
   const params = useParams();
@@ -13,8 +14,8 @@ const SnapshotPage = () => {
   const revisionId = params?.revisionId as string;
   const title = decodeURIComponent(slug.replace(/_/g, ' '));
   
-  const { revisions, isLoading: isRevisionsLoading, hasMore, loadMore } = useRevisions(title);
-  const { content, isLoading: isContentLoading } = useArticleContent(revisionId, title);
+  const { revisions, isLoading: isRevisionsLoading, hasMore, loadMore } = useArticleRevisions(title);
+  const { content, isLoading: isContentLoading } = useArticleSnapshots(revisionId, title);
 
   // Transform revisions data into heatmap format with unique keys
   const heatmapData = useMemo(() => {
