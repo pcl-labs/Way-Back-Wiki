@@ -14,11 +14,12 @@ export async function GET(request: NextRequest) {
     apiUrl.searchParams.append('action', 'parse');
     apiUrl.searchParams.append('format', 'json');
     apiUrl.searchParams.append('origin', '*');
+    apiUrl.searchParams.append('prop', 'text|displaytitle');
 
     if (articleId) {
-      apiUrl.searchParams.append('pageid', articleId);
+      apiUrl.searchParams.append('oldid', articleId);
     } else if (title) {
-      apiUrl.searchParams.append('page', title);
+      apiUrl.searchParams.append('page', decodeURIComponent(title));
     }
 
     const response = await fetch(apiUrl.toString());
@@ -28,9 +29,15 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    const content = data.parse.text['*'];
+    
+    if (!data.parse) {
+      throw new Error('Invalid response from Wikipedia API');
+    }
 
-    return NextResponse.json({ content });
+    const content = data.parse.text['*'];
+    const displayTitle = data.parse.displaytitle;
+
+    return NextResponse.json({ content, title: displayTitle });
   } catch (error) {
     console.error('Error fetching article content:', error);
     return NextResponse.json({ error: 'Failed to fetch article content' }, { status: 500 });

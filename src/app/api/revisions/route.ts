@@ -9,6 +9,10 @@ export async function GET(request: NextRequest) {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const rvcontinue = searchParams.get('rvcontinue') || '';
 
+  if (!id && !title) {
+    return NextResponse.json({ error: 'Either id or title parameter is required' }, { status: 400 });
+  }
+
   try {
     const apiUrl = new URL('https://en.wikipedia.org/w/api.php');
     apiUrl.searchParams.append('action', 'query');
@@ -21,7 +25,7 @@ export async function GET(request: NextRequest) {
     if (id) {
       apiUrl.searchParams.append('pageids', id);
     } else if (title) {
-      apiUrl.searchParams.append('titles', title);
+      apiUrl.searchParams.append('titles', decodeURIComponent(title));
     }
 
     if (rvcontinue) {
@@ -29,10 +33,33 @@ export async function GET(request: NextRequest) {
     }
 
     const response = await fetch(apiUrl.toString());
+    
+    if (!response.ok) {
+      throw new Error(`Wikipedia API responded with status: ${response.status}`);
+    }
+    
     const data = await response.json();
+
+    if (data.error) {
+      console.error('Wikipedia API error:', data.error);
+      return NextResponse.json({ error: data.error.info }, { status: 500 });
+    }
+
+    // Check if pages exist in the response
+    if (!data.query?.pages) {
+      console.error('No pages found in Wikipedia API response');
+      return NextResponse.json({ error: 'No page found' }, { status: 404 });
+    }
 
     const pageId = Object.keys(data.query.pages)[0];
     const pageData = data.query.pages[pageId];
+
+    // Check if the page exists
+    if (pageId === '-1' || !pageData) {
+      console.error('Page not found');
+      return NextResponse.json({ error: 'Page not found' }, { status: 404 });
+    }
+
     const revisions = pageData.revisions || [];
     const pageTitle = pageData.title;
     const titleSlug = pageTitle.replace(/ /g, '_');
@@ -74,6 +101,8 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching revisions:', error);
-    return NextResponse.json({ error: 'Failed to fetch revisions' }, { status: 500 });
+    return NextResponse.json({ 
+      error: error instanceof Error ? error.message : 'Failed to fetch revisions' 
+    }, { status: 500 });
   }
 }

@@ -6,12 +6,15 @@ import '@/styles/wikipedia-styles.css';
 
 interface ArticleContentProps {
   html: string;
+  className?: string;
 }
 
-export function ArticleContent({ html }: ArticleContentProps) {
+export function ArticleContent({ html, className = '' }: ArticleContentProps) {
   const [sanitizedHTML, setSanitizedHTML] = useState('');
 
   useEffect(() => {
+    if (!html) return;
+    
     const clean = DOMPurify.sanitize(html, {
       ADD_TAGS: ['math', 'mrow', 'mi', 'mn', 'mo', 'msup', 'mfrac'],
       ADD_ATTR: ['xmlns', 'display', 'alttext'],
@@ -19,8 +22,10 @@ export function ArticleContent({ html }: ArticleContentProps) {
     setSanitizedHTML(clean);
   }, [html]);
 
+  if (!html) return null;
+
   return (
-    <div className="mw-parser-output">
+    <div className={`mw-parser-output ${className}`}>
       <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />
     </div>
   );

@@ -1,19 +1,21 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
-import { ClientSideArticle } from '@/components/ClientSideArticle';
+import { ArticleContent } from '@/components/ArticleContent';
 import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
 
 const SnapshotPage = () => {
-  // Use the useParams hook instead of receiving props
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
+  const encodedTitle = searchParams.get('title') || '';
+  const title = decodeURIComponent(encodedTitle.replace(/_/g, ' '));
   
-  const { revisions, isLoading: isRevisionsLoading } = useRevisions(id);
-  const { content, isLoading: isContentLoading } = useArticleContent(id);
+  const { revisions, isLoading: isRevisionsLoading } = useRevisions(title);
+  const { content, isLoading: isContentLoading } = useArticleContent(id, title);
 
   if (isRevisionsLoading || isContentLoading) {
     return <div>Loading...</div>;
@@ -23,7 +25,7 @@ const SnapshotPage = () => {
     <>
       <Header />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Article Snapshot: {id}</h1>
+        <h1 className="text-3xl font-bold mb-6">Article Snapshot: {title}</h1>
         <div className="mb-8">
           <Heatmap 
             revisions={revisions} 
@@ -34,7 +36,8 @@ const SnapshotPage = () => {
           />
         </div>
         <div className="mt-8">
-          <ClientSideArticle content={content} title={id} />
+          <h2 className="text-2xl font-bold mb-4">{title}</h2>
+          <ArticleContent html={content} className="prose max-w-none" />
         </div>
       </div>
     </>
