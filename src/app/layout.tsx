@@ -32,7 +32,7 @@ export default function RootLayout({
         <header className="bg-gray-900 sticky top-0 z-40 w-full border-b border-gray-700">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
             <nav className="flex items-center">
-              <Link href="/" className="text-xl font-bold text-white hover:text-blue-400 transition-colors duration-200">
+              <Link href="/" className="text-xl font-bold text-white hover:text-gray-400 transition-colors duration-200">
                 Way Back Wiki
               </Link>
             </nav>
