@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/Header';
 import { RevisionList } from '@/components/RevisionList';
 import { useArticleRevisions } from '@/hooks/useArticleRevisions';
 import { ArticleRevision } from '@/types/articleRevisions';
@@ -21,7 +20,6 @@ const ArticlePage = () => {
 
   return (
     <>
-      <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Article Revisions: {title}</h1>
         <div className="mt-8">

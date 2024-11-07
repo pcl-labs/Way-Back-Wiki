@@ -2,7 +2,6 @@
 
 import React, { useMemo, useRef, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
 import { ArticleSnapshot } from '@/components/ArticleSnapshot';
 import { useArticleRevisions } from '@/hooks/useArticleRevisions';
@@ -84,7 +83,6 @@ const SnapshotPage = () => {
 
   return (
     <>
-      <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Article Snapshot: {title}</h1>
         <div className="mb-8">
