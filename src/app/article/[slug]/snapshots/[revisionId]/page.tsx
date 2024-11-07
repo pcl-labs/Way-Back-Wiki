@@ -8,12 +8,6 @@ import { useArticleRevisions } from '@/hooks/useArticleRevisions';
 import { useArticleSnapshots } from '@/hooks/useArticleSnapshots';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import dynamic from 'next/dynamic';
-
-const Heatmap = dynamic(() => import('@/components/Heatmap'), {
-  loading: () => <Skeleton className="h-64 w-full" />,
-  ssr: false,
-});
 
 const SnapshotPage = () => {
   const params = useParams();
@@ -21,7 +15,6 @@ const SnapshotPage = () => {
   const revisionId = params?.revisionId as string;
   const title = decodeURIComponent(slug.replace(/_/g, ' '));
   
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { revisions, isLoading: isRevisionsLoading } = useArticleRevisions(title, { fullHistory: true });
   const { content, isLoading: isContentLoading } = useArticleSnapshots(revisionId, title);
 
@@ -34,40 +27,6 @@ const SnapshotPage = () => {
     revisions.find(rev => rev.id === currentRevision?.parentId),
     [revisions, currentRevision]
   );
-
-  const heatmapData = useMemo(() => {
-    const countMap: { 
-      [key: string]: { 
-        count: number; 
-        revisions: Array<{ 
-          id: string;
-          timestamp: string 
-        }> 
-      } 
-    } = {};
-    
-    revisions.forEach(revision => {
-      const date = new Date(revision.timestamp).toISOString().split('T')[0];
-      if (!countMap[date]) {
-        countMap[date] = { count: 0, revisions: [] };
-      }
-      countMap[date].count += 1;
-      countMap[date].revisions.push({ 
-        id: revision.id.toString(),
-        timestamp: revision.timestamp 
-      });
-    });
-
-    return Object.entries(countMap).map(([date, data]) => ({
-      date,
-      count: data.count,
-      revisions: data.revisions,
-    }));
-  }, [revisions]);
-
-  const maxCount = useMemo(() => {
-    return Math.max(...heatmapData.map(d => d.count), 1);
-  }, [heatmapData]);
 
   return (
     <>
@@ -109,21 +68,6 @@ const SnapshotPage = () => {
             )}
           </div>
         )}
-        <div className="mb-8">
-          {isRevisionsLoading ? (
-            <Skeleton className="h-64 w-full" />
-          ) : (
-            <Suspense fallback={<Skeleton className="h-64 w-full" />}>
-              <Heatmap 
-                data={heatmapData}
-                maxCount={maxCount}
-                onDayClick={(day) => {
-                  console.log('Day clicked:', day);
-                }}
-              />
-            </Suspense>
-          )}
-        </div>
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">{title}</h2>
           {isContentLoading ? (
