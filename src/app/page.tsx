@@ -1,10 +1,8 @@
 import Link from 'next/link';
-import { Header } from '@/components/Header';
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-grow flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Welcome to Way Back Wiki</h1>

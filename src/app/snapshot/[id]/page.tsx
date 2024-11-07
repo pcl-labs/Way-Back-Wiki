@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/Header';
 import { Heatmap } from '@/components/Heatmap';
 import { ClientSideArticle } from '@/components/ClientSideArticle';
 import { useRevisions, useArticleContent } from '@/hooks/useWikipediaData';
@@ -21,7 +20,6 @@ const SnapshotPage = () => {
 
   return (
     <>
-      <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Article Snapshot: {id}</h1>
         <div className="mb-8">

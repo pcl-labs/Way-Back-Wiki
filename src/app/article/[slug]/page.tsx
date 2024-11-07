@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { Header } from '@/components/Header';
 import { RevisionList } from '@/components/RevisionList';
 import { SnapshotLink } from '@/components/SnapshotLink';
 import { useRevisions } from '@/hooks/useWikipediaData';
@@ -20,7 +19,6 @@ const ArticlePage = () => {
 
   return (
     <>
-      <Header />
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Article Revisions: {title}</h1>
         {revisions.length > 0 && (
