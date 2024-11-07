@@ -6,12 +6,16 @@ interface WikiRevision {
   user: string;
   timestamp: string;
   comment: string;
+  size?: number;
+  sizediff?: number;
+  '*'?: string;
 }
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const title = searchParams.get('title');
   const rvcontinue = searchParams.get('rvcontinue');
+  const fullHistory = searchParams.get('fullHistory') === 'true';
 
   if (!title) {
     return NextResponse.json({ error: 'Title parameter is required' }, { status: 400 });
@@ -22,16 +26,17 @@ export async function GET(request: NextRequest) {
     apiUrl.searchParams.append('action', 'query');
     apiUrl.searchParams.append('prop', 'revisions');
     apiUrl.searchParams.append('titles', decodeURIComponent(title));
-    apiUrl.searchParams.append('rvprop', 'ids|timestamp|user|comment');
-    apiUrl.searchParams.append('rvlimit', '500');
+    apiUrl.searchParams.append('rvprop', 'ids|timestamp|user|comment|size|sizediff|content');
     apiUrl.searchParams.append('format', 'json');
     apiUrl.searchParams.append('origin', '*');
-    
     apiUrl.searchParams.append('rvdir', 'older');
     apiUrl.searchParams.append('rvstart', 'now');
     apiUrl.searchParams.append('rvend', '2000-01-01T00:00:00Z');
 
-    if (rvcontinue) {
+    // For full history, use maximum limit, otherwise use standard pagination
+    apiUrl.searchParams.append('rvlimit', fullHistory ? '5000' : '50');
+
+    if (rvcontinue && !fullHistory) {
       apiUrl.searchParams.append('rvcontinue', rvcontinue);
     }
 
@@ -62,10 +67,14 @@ export async function GET(request: NextRequest) {
       parentId: rev.parentid,
       user: rev.user,
       timestamp: rev.timestamp,
-      comment: rev.comment
+      comment: rev.comment,
+      size: rev.size,
+      sizediff: rev.sizediff,
+      content: rev['*']
     }));
 
-    const nextContinue = data.continue?.rvcontinue || null;
+    // Only include continue token if not requesting full history
+    const nextContinue = !fullHistory ? data.continue?.rvcontinue : null;
 
     return NextResponse.json({
       revisions: processedRevisions,

@@ -21,7 +21,7 @@ interface HeatmapValue {
   }>;
 }
 
-export function Heatmap({ data, maxCount, onDayClick }: HeatmapProps) {
+const Heatmap: React.FC<HeatmapProps> = ({ data, maxCount, onDayClick }) => {
   const startDate = new Date();
   startDate.setFullYear(startDate.getFullYear() - 1);
   const endDate = new Date();
@@ -109,4 +109,6 @@ export function Heatmap({ data, maxCount, onDayClick }: HeatmapProps) {
       </div>
     </Tooltip.Provider>
   );
-}
+};
+
+export default Heatmap;

@@ -6,4 +6,7 @@ export interface ArticleRevision {
   user: string;
   timestamp: string;
   comment: string;
+  size?: number;
+  sizediff?: number;
+  content?: string;
 }
