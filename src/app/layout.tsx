@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Link from "next/link";
+import { MobileFooter } from '@/components/MobileFooter';
 import "./globals.css";
 
 const geistSans = localFont({
@@ -26,6 +27,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <style>{`
+          @keyframes bubble-pop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -150%) scale(1); opacity: 0.5; }
+            100% { transform: translate(-50%, -200%) scale(1.5); opacity: 0; }
+          }
+          .animate-bubble-pop {
+            animation: bubble-pop 0.3s ease-out;
+          }
+          .bubble {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+          }
+        `}</style>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-100 dark:bg-gray-900 flex flex-col min-h-screen`}
       >
@@ -46,10 +65,11 @@ export default function RootLayout({
             </div>
           </div>
         </header>
-        <main className="flex-grow">
+        <main className="flex-grow mb-16 md:mb-0">
           {children}
         </main>
-        <footer className="bg-gray-900 text-white py-4 mt-auto">
+        {/* Desktop Footer */}
+        <footer className="bg-gray-900 text-white py-4 mt-auto hidden md:block">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center">
               <p>&copy; 2024 Way Back Wiki. All rights reserved.</p>
@@ -64,6 +84,8 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        {/* Mobile Footer */}
+        <MobileFooter />
       </body>
     </html>
   );
